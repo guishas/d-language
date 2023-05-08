@@ -46,7 +46,7 @@ Guilherme Lunetta
 
 `FUNCTION_RETURN = "return", EXPRESSION;`
 
-`FUNCTION_CALL = IDENTIFIER, "(", [ IDENTIFIER, {",", IDENTIFIER} ]);`
+`FUNCTION_CALL = IDENTIFIER, "(", [ IDENTIFIER, {",", IDENTIFIER} ], ")";`
 
 `CONDITIONAL = EXPRESSION, { ( "<" | "<=" | "==" | "!=" | ">=" | ">" ), EXPRESSION };`
 
