@@ -1,0 +1,9 @@
+int a = 2; # int declaration example
+double b = 3.5;
+bool isDuda = true;
+string fileExtension = ".dd";
+isDuda = false;
+
+print(a);
+print(b);
+print(!isDuda);

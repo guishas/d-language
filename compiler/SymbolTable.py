@@ -1,0 +1,25 @@
+class SymbolTable():
+    
+  def __init__(self):
+    self.table = {}
+
+  def create(self, key, value):
+    if self.table.get(key) != None:
+      raise Exception(f"A variable with the name {key} already exists.")
+    else:
+      self.table[key] = value
+
+  def get(self, key):
+    if self.table.get(key) != None:
+      return self.table[key]
+    else:
+      raise Exception(f"A variable with the name {key} doesn't exists.")
+    
+  def set(self, key, value):
+    if self.table.get(key) != None:
+      if self.table[key][0] == value[0]:
+        self.table[key] = value
+      else:
+        raise Exception(f"The type {self.table[key][0]} doesn't math with the type {value[0]}")
+    else:
+      raise Exception(f"A variable with the name {key} doesn't exists.")
