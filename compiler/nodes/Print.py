@@ -6,5 +6,5 @@ class Print(Node):
     self.value = value
     self.children = children
 
-  def Evaluate(self, symbol_table):
-    print(self.children[0].Evaluate(symbol_table)[1])
+  def Evaluate(self, symbol_table, func_table):
+    print(self.children[0].Evaluate(symbol_table, func_table)[1])

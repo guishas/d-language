@@ -6,5 +6,5 @@ class IntVal(Node):
     self.value = value
     self.children = children
 
-  def Evaluate(self, symbol_table):
+  def Evaluate(self, symbol_table, func_table):
     return ["int", self.value]

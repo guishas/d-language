@@ -6,5 +6,5 @@ class VarDec(Node):
     self.value = value
     self.children = children
 
-  def Evaluate(self, symbol_table):
-    symbol_table.create(self.children[0].value, [self.value, self.children[1].Evaluate(symbol_table)[1]])
+  def Evaluate(self, symbol_table, func_table):
+    symbol_table.create(self.children[0].value, [self.value, self.children[1].Evaluate(symbol_table, func_table)[1]])

@@ -6,8 +6,8 @@ class Return(Node):
     self.value = value
     self.children = children
 
-  def Evaluate(self, symbol_table):
+  def Evaluate(self, symbol_table, func_table):
     if len(self.children) == 0:
       return ["void", ""]
     
-    return self.children[0].Evaluate(symbol_table)
+    return self.children[0].Evaluate(symbol_table, func_table)

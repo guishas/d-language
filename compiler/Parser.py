@@ -12,6 +12,10 @@ from nodes.Assignment import Assignment
 from nodes.VarDec import VarDec
 from nodes.Return import Return
 from nodes.Print import Print
+from nodes.FuncCall import FuncCall
+from nodes.FuncDec import FuncDec
+from nodes.If import If
+from nodes.While import While
 
 class Parser():
 
@@ -26,16 +30,18 @@ class Parser():
     return node
   
   def parseStatement(self):
-    if self.tokenizer.next.type == "TT_SEMICOLON":
-      self.tokenizer.selectNext()
-      return NoOp("NOOP", [])
-    elif self.tokenizer.next.type == "TT_IDENTIFIER":
+    if self.tokenizer.next.type == "TT_IDENTIFIER":
       value = self.tokenizer.next.value
       self.tokenizer.selectNext()
 
       if self.tokenizer.next.type == "TT_ASSIGN":
         self.tokenizer.selectNext()
-        return Assignment("ASSIGNMENT", [Identifier(value, []), self.parseRelExpression()])
+        node = Assignment("ASSIGNMENT", [Identifier(value, []), self.parseRelExpression()])
+        if self.tokenizer.next.type == "TT_SEMICOLON":
+          self.tokenizer.selectNext()
+          return node
+        else:
+          raise Exception(f"Expected ; to end a line.")
       else:
         raise Exception(f"Unexpected token: {self.tokenizer.next.type}")
     elif self.tokenizer.next.type == "TT_TYPE":
@@ -46,8 +52,14 @@ class Parser():
         self.tokenizer.selectNext()
         if self.tokenizer.next.type == "TT_ASSIGN":
           self.tokenizer.selectNext()
-          return VarDec(type, [Identifier(value, []), self.parseRelExpression()])
-        elif self.tokenizer.spyNext().type == "TT_SEMICOLON":
+          node = VarDec(type, [Identifier(value, []), self.parseRelExpression()])
+          if self.tokenizer.next.type == "TT_SEMICOLON":
+            self.tokenizer.selectNext()
+            return node
+          else:
+            raise Exception(f"Expected ; to end a line.")
+        elif self.tokenizer.next.type == "TT_SEMICOLON":
+          self.tokenizer.selectNext()
           if type == "int":
             return VarDec(type, [Identifier(value, []), IntVal(0, [])])
           elif type == "double":
@@ -57,15 +69,21 @@ class Parser():
           else:
             return VarDec(type, [Identifier(value, []), BoolVal(None, [])])
         else:
-          raise Exception(f"Unexpected token after identifier: {self.tokenizer.spyNext().type}")
+          raise Exception(f"Unexpected token after identifier: {self.tokenizer.next.type}")
       else:
         raise Exception(f"Unexpected token: {self.tokenizer.next.type}")
     elif self.tokenizer.next.type == "TT_RETURN":
       self.tokenizer.selectNext()
       if self.tokenizer.next.type == "TT_SEMICOLON":
+        self.tokenizer.selectNext()
         return Return("RETURN", [])
       else:
-        return Return("RETURN", [self.parseExpression()])
+        node = Return("RETURN", [self.parseExpression()])
+        if self.tokenizer.next.type == "TT_SEMICOLON":
+          self.tokenizer.selectNext()
+          return node
+        else:
+          raise Exception(f"Expected ; to end a line.")
     elif self.tokenizer.next.type == "TT_PRINT":
       self.tokenizer.selectNext()
       if self.tokenizer.next.type == "TT_LPAR":
@@ -74,15 +92,87 @@ class Parser():
 
         if self.tokenizer.next.type == "TT_RPAR":
           self.tokenizer.selectNext()
-          return node
+          if self.tokenizer.next.type == "TT_SEMICOLON":
+            self.tokenizer.selectNext()
+            return node
+          else:
+            raise Exception(f"Expected ; to end a line.")
         else:
           raise Exception(f"Unexpected token: {self.tokenizer.next.type}")
       else:
         raise Exception(f"Unexpected token: {self.tokenizer.next.type}")
     elif self.tokenizer.next.type == "TT_WHILE":
-      pass
+      self.tokenizer.selectNext()
+      if self.tokenizer.next.type == "TT_LPAR":
+        self.tokenizer.selectNext()
+        condition = self.parseRelExpression()
+
+        if self.tokenizer.next.type == "TT_RPAR":
+          self.tokenizer.selectNext()
+          if self.tokenizer.next.type == "TT_LBRACKET":
+            self.tokenizer.selectNext()
+            children = []
+            while not self.tokenizer.next.type == "TT_RBRACKET":
+              children.append(self.parseStatement())
+
+            while_block = Block("BLOCK", children)
+
+            if self.tokenizer.next.type == "TT_RBRACKET":
+              self.tokenizer.selectNext()
+              return While("WHILE", [condition, while_block])
+            else:
+              raise Exception(f"Unexpected token: {self.tokenizer.next.type}")
+          else:
+            raise Exception(f"Unexpected token: {self.tokenizer.next.type}")
+        else:
+          raise Exception(f"Unexpected token: {self.tokenizer.next.type}")
+      else:
+        raise Exception(f"Unexpected token: {self.tokenizer.next.type}")
     elif self.tokenizer.next.type == "TT_IF":
-      pass
+      self.tokenizer.selectNext()
+      if self.tokenizer.next.type == "TT_LPAR":
+        self.tokenizer.selectNext()
+        condition = self.parseRelExpression()
+
+        if self.tokenizer.next.type == "TT_RPAR":
+          self.tokenizer.selectNext()
+          if self.tokenizer.next.type == "TT_LBRACKET":
+            self.tokenizer.selectNext()
+            children = []
+            while not self.tokenizer.next.type == "TT_RBRACKET":
+              children.append(self.parseStatement())
+
+            if_block = Block("BLOCK", children)
+
+            if self.tokenizer.next.type == "TT_RBRACKET":
+              self.tokenizer.selectNext()
+              if self.tokenizer.next.type == "TT_ELSE":
+                self.tokenizer.selectNext()
+                if self.tokenizer.next.type == "TT_LBRACKET":
+                  self.tokenizer.selectNext()
+                  else_children = []
+                  while not self.tokenizer.next.type == "TT_RBRACKET":
+                    else_children.append(self.parseStatement())
+
+                  else_block = Block("BLOCK", else_children)
+
+                  if self.tokenizer.next.type == "TT_RBRACKET":
+                    self.tokenizer.selectNext()
+                    return If("IF", [condition, if_block, else_block])
+                  else:
+                    raise Exception(f"Unexpected token: {self.tokenizer.next.type}.")
+                else:
+                  raise Exception(f"Unexpected token: {self.tokenizer.next.type}.")
+              else:
+                return If("IF", [condition, if_block])
+            else:
+              raise Exception(f"Unexpected token: {self.tokenizer.next.type}.")
+          else:
+            raise Exception(f"Unexpected token: {self.tokenizer.next.type}.")
+        else:
+          raise Exception(f"Unexpected token: {self.tokenizer.next.type}.")
+      else:
+        raise Exception(f"Unexpected token: {self.tokenizer.next.type}.")
     elif self.tokenizer.next.type == "TT_FUNC":
       pass
     else:
@@ -186,14 +276,32 @@ class Parser():
       self.tokenizer.selectNext()
 
       if self.tokenizer.next.type == "TT_LPAR":
-        pass
+        self.tokenizer.selectNext()
+        args = []
+        if self.tokenizer.next.type == "TT_RPAR":
+          self.tokenizer.selectNext()
+          return FuncCall(value, [])
+        else:
+          args.append(self.parseRelExpression())
+
+          while self.tokenizer.next.type == "TT_COMMA":
+            self.tokenizer.selectNext()
+            args.append(self.parseRelExpression())
+
+          if self.tokenizer.next.type == "TT_RPAR":
+            self.tokenizer.selectNext()
+            return FuncCall(value, args)
+          else:
+            raise Exception(f"Unexpected token: {self.tokenizer.next.type}.")
       else:
         return Identifier(value, [])
+    else:
+      raise Exception(f"Unexpected token: {self.tokenizer.next.type}.")
   
-  def run(self, symbol_table):
+  def run(self, symbol_table, func_table):
     self.tokenizer.selectNext()
     result = self.parseBlock()
     if self.tokenizer.next.type != "EOF":
       raise Exception(f"Unexpected token: {self.tokenizer.next.type}")
     
-    return result.Evaluate(symbol_table)
+    return result.Evaluate(symbol_table, func_table)

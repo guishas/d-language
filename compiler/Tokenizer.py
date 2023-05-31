@@ -6,7 +6,7 @@ class Tokenizer():
     self.source_code = source_code
     self.position = 0
     self.types = ["int", "double", "string", "bool"]
-    self.reserved = ["print", "func", "return", "if", "else", "while", "void", "true", "false"]
+    self.reserved = ["print", "func", "return", "if", "else", "while", "void", "True", "False"]
     self.next = None
 
   def spyNext(self):
@@ -81,21 +81,21 @@ class Tokenizer():
     elif self.source_code[self.position] == '!':
       if self.source_code[self.position] == '=':
         self.next = Token("TT_DIFF", "!=")
-        self.position += 1
+        self.position += 2
       else:
         self.next = Token("TT_NOT", "!")
         self.position += 1
     elif self.source_code[self.position] == '>':
       if self.source_code[self.position+1] == '=':
         self.next = Token("TT_GREATER_EQUAL", ">=")
-        self.position += 1
+        self.position += 2
       else:
         self.next = Token("TT_GREATER", ">")
         self.position += 1
     elif self.source_code[self.position] == '<':
-      if self.source_code[self.position] == '=':
+      if self.source_code[self.position+1] == '=':
         self.next = Token("TT_LESS_EQUAL", "<=")
-        self.position += 1
+        self.position += 2
       else:
         self.next = Token("TT_LESS", "<")
         self.position += 1
@@ -146,8 +146,11 @@ class Tokenizer():
       if var in self.types:
         self.next = Token("TT_TYPE", var)
       else:
-        if var in ["true", "false"]:
-          self.next = Token("TT_BOOL", var)
+        if var in ["True", "False"]:
+          if var == "True":
+            self.next = Token("TT_BOOL", var)
+          else:
+            self.next = Token("TT_BOOL", "")
         else:
           self.next = Token("TT_" + var.upper(), var)
     else:

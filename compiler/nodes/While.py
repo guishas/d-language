@@ -6,6 +6,6 @@ class While(Node):
     self.value = value
     self.children = children
 
-  def Evaluate(self, symbol_table):
-    while self.children[0].Evaluate(symbol_table)[1] == True:
-      self.children[1].Evaluate(symbol_table)
+  def Evaluate(self, symbol_table, func_table):
+    while self.children[0].Evaluate(symbol_table, func_table)[1] == True:
+      self.children[1].Evaluate(symbol_table, func_table)

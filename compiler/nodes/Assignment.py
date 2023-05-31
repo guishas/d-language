@@ -6,5 +6,5 @@ class Assignment(Node):
     self.value = value
     self.children = children
 
-  def Evaluate(self, symbol_table):
-    symbol_table.set(self.children[0].value, self.children[1].Evaluate(symbol_table))
+  def Evaluate(self, symbol_table, func_table):
+    symbol_table.set(self.children[0].value, self.children[1].Evaluate(symbol_table, func_table))
