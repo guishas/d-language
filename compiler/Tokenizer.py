@@ -5,8 +5,8 @@ class Tokenizer():
   def __init__(self, source_code):
     self.source_code = source_code
     self.position = 0
-    self.types = ["int", "double", "string", "bool"]
-    self.reserved = ["print", "func", "return", "if", "else", "while", "void", "True", "False"]
+    self.types = ["int", "double", "string", "bool", "void"]
+    self.reserved = ["print", "func", "return", "if", "else", "while", "True", "False"]
     self.next = None
 
   def spyNext(self):

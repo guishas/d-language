@@ -3,17 +3,17 @@ double b = 4.0;
 bool isDuda = True;
 string fileExtension = ".dd";
 
-print(a);
-print(b);
-print(!isDuda);
-
-int i = 1;
-
-while (i <= 10) {
-  if (i == 2) {
-    print("i = 2");
-  }
-
-  print(i);
-  i = i + 1;
+func add(int n1, int n2) -> int {
+  return n1 + n2;
 }
+
+func isGreater(int z, int c) -> bool {
+  return z > c;
+}
+
+func testVoid() -> void {
+  print("test void");
+  return;
+}
+
+testVoid();

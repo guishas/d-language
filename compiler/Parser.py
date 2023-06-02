@@ -25,12 +25,20 @@ class Parser():
   def parseBlock(self):
     node = Block("BLOCK", [])
     while not self.tokenizer.next.type == "EOF":
-      node.children.append(self.parseStatement())
+      node.children.append(self.parseStatement(False))
     
     return node
   
-  def parseStatement(self):
+  def parseStatement(self, inside_func):
     if self.tokenizer.next.type == "TT_IDENTIFIER":
+      if self.tokenizer.spyNext().type == "TT_LPAR":
+        func_call = self.parseFactor()
+        if self.tokenizer.next.type == "TT_SEMICOLON":
+          self.tokenizer.selectNext()
+          return func_call
+        else:
+          raise Exception(f"Expected ; to end a line.")
+      
       value = self.tokenizer.next.value
       self.tokenizer.selectNext()
 
@@ -58,18 +66,25 @@ class Parser():
             return node
           else:
             raise Exception(f"Expected ; to end a line.")
-        elif self.tokenizer.next.type == "TT_SEMICOLON":
-          self.tokenizer.selectNext()
-          if type == "int":
-            return VarDec(type, [Identifier(value, []), IntVal(0, [])])
-          elif type == "double":
-            return VarDec(type, [Identifier(value, []), DoubleVal(0.0, [])])
-          elif type == "string":
-            return VarDec(type, [Identifier(value, []), StrVal("", [])])
-          else:
-            return VarDec(type, [Identifier(value, []), BoolVal(None, [])])
         else:
-          raise Exception(f"Unexpected token after identifier: {self.tokenizer.next.type}")
+          if type == "int":
+            node = VarDec(type, [Identifier(value, []), IntVal(0, [])])
+          elif type == "double":
+            node = VarDec(type, [Identifier(value, []), DoubleVal(0.0, [])])
+          elif type == "string":
+            node = VarDec(type, [Identifier(value, []), StrVal("", [])])
+          else:
+            node = VarDec(type, [Identifier(value, []), BoolVal(None, [])])
+          
+          if inside_func:
+            return node
+          else:
+            self.tokenizer.selectNext()
+            if self.tokenizer.next.type == "TT_SEMICOLON":
+              self.tokenizer.selectNext()
+              return node
+            else:
+              raise Exception(f"Expected ; to end a line.")
       else:
         raise Exception(f"Unexpected token: {self.tokenizer.next.type}")
     elif self.tokenizer.next.type == "TT_RETURN":
@@ -78,7 +93,7 @@ class Parser():
         self.tokenizer.selectNext()
         return Return("RETURN", [])
       else:
-        node = Return("RETURN", [self.parseExpression()])
+        node = Return("RETURN", [self.parseRelExpression()])
         if self.tokenizer.next.type == "TT_SEMICOLON":
           self.tokenizer.selectNext()
           return node
@@ -113,7 +128,7 @@ class Parser():
             self.tokenizer.selectNext()
             children = []
             while not self.tokenizer.next.type == "TT_RBRACKET":
-              children.append(self.parseStatement())
+              children.append(self.parseStatement(False))
 
             while_block = Block("BLOCK", children)
 
@@ -140,7 +155,7 @@ class Parser():
             self.tokenizer.selectNext()
             children = []
             while not self.tokenizer.next.type == "TT_RBRACKET":
-              children.append(self.parseStatement())
+              children.append(self.parseStatement(False))
 
             if_block = Block("BLOCK", children)
 
@@ -152,7 +167,7 @@ class Parser():
                   self.tokenizer.selectNext()
                   else_children = []
                   while not self.tokenizer.next.type == "TT_RBRACKET":
-                    else_children.append(self.parseStatement())
+                    else_children.append(self.parseStatement(False))
 
                   else_block = Block("BLOCK", else_children)
 
@@ -174,7 +189,58 @@ class Parser():
       else:
         raise Exception(f"Unexpected token: {self.tokenizer.next.type}.")
     elif self.tokenizer.next.type == "TT_FUNC":
-      pass
+      self.tokenizer.selectNext()
+      if self.tokenizer.next.type == "TT_IDENTIFIER":
+        identifier = self.tokenizer.next.value
+        self.tokenizer.selectNext()
+        if self.tokenizer.next.type == "TT_LPAR":
+          self.tokenizer.selectNext()
+          params = []
+          if self.tokenizer.next.type == "TT_TYPE":
+            params.append(self.parseStatement(True))
+
+            while self.tokenizer.next.type == "TT_COMMA":
+              self.tokenizer.selectNext()
+              params.append(self.parseStatement(True))
+          
+          if self.tokenizer.next.type == "TT_RPAR":
+            self.tokenizer.selectNext()
+            if self.tokenizer.next.type == "TT_RET_TYPE":
+              self.tokenizer.selectNext()
+              if self.tokenizer.next.type == "TT_TYPE":
+                type = self.tokenizer.next.value
+                self.tokenizer.selectNext()
+                if self.tokenizer.next.type == "TT_LBRACKET":
+                  self.tokenizer.selectNext()
+                  func_block = []
+                  while not self.tokenizer.next.type == "TT_RBRACKET":
+                    func_block.append(self.parseStatement(False))
+
+                  block = Block("BLOCK", func_block)
+
+                  if self.tokenizer.next.type == "TT_RBRACKET":
+                    self.tokenizer.selectNext()
+                    func_children = [Identifier(identifier, [])]
+                    for param in params:
+                      func_children.append(param)
+
+                    func_children.append(block)
+                    
+                    return FuncDec(type, func_children)
+                  else:
+                    raise Exception(f"Unexpected token: {self.tokenizer.next.type}")
+                else:
+                  raise Exception(f"Unexpected token: {self.tokenizer.next.type}")
+              else:
+                raise Exception(f"Unexpected token: {self.tokenizer.next.type}")
+            else:
+              raise Exception(f"Unexpected token: {self.tokenizer.next.type}")
+          else:
+            raise Exception(f"Unexpected token: {self.tokenizer.next.type}")
+        else:
+          raise Exception(f"Unexpected token: {self.tokenizer.next.type}")
+      else:
+        raise Exception(f"Unexpected token: {self.tokenizer.next.type}")
     else:
       raise Exception(f"Unexpected token: {self.tokenizer.next.type}")
 
