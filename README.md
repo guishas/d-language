@@ -18,7 +18,7 @@ Guilherme Lunetta
 
 `CHARACTER = ( LETTER | DIGIT | SYMBOL );`
 
-`BOOL = ( "true" | "false" );`
+`BOOL = ( "True" | "False" );`
 
 `INT = DIGIT, {DIGIT};`
 
