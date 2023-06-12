@@ -6,10 +6,11 @@
 
 %%
 
-"true"|"false"                      { printf("BOOL_LITERAL\n"); return BOOL_LITERAL; }
+"True"|"False"                      { printf("BOOL_LITERAL\n"); return BOOL_LITERAL; }
 "string"|"int"|"double"|"bool"      { printf("TYPE\n"); return TYPE; }
 "void"                              { printf("VOID\n"); return VOID; } 
 "print"                             { printf("PRINT\n"); return PRINT; }
+"ask"                               { printf("ASK\n"); return ASK; }
 "if"                                { printf("IF\n"); return IF; }
 "else"                              { printf("ELSE\n"); return ELSE; }
 "while"                             { printf("WHILE\n"); return WHILE; }
@@ -19,6 +20,7 @@
 "-"                                 { printf("MINUS\n"); return MINUS; }    
 "*"                                 { printf("MULT\n"); return MULT; }
 "/"                                 { printf("DIV\n"); return DIV; }
+"%"                                 { printf("REMAINDER\n"); return REMAINDER; }
 "^"                                 { printf("POW\n"); return POW; }
 "and"                               { printf("AND\n"); return AND; }
 "or"                                { printf("OR\n"); return OR; }
