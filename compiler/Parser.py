@@ -16,6 +16,7 @@ from nodes.FuncCall import FuncCall
 from nodes.FuncDec import FuncDec
 from nodes.If import If
 from nodes.While import While
+from nodes.Ask import Ask
 
 class Parser():
 
@@ -79,7 +80,6 @@ class Parser():
           if inside_func:
             return node
           else:
-            self.tokenizer.selectNext()
             if self.tokenizer.next.type == "TT_SEMICOLON":
               self.tokenizer.selectNext()
               return node
@@ -287,18 +287,31 @@ class Parser():
     return node
 
   def parseTerm(self):
-    node = self.parseFactor()
+    node = self.parseExponent()
 
-    while self.tokenizer.next.type in ["TT_MULT", "TT_DIV", "TT_AND"]:
+    while self.tokenizer.next.type in ["TT_MULT", "TT_DIV", "TT_AND", "TT_REMAINDER"]:
       if self.tokenizer.next.type == "TT_MULT":
         self.tokenizer.selectNext()
-        node = BinOp("*", [node, self.parseFactor()])
+        node = BinOp("*", [node, self.parseExponent()])
       elif self.tokenizer.next.type == "TT_DIV":
         self.tokenizer.selectNext()
-        node = BinOp("/", [node, self.parseFactor()])
+        node = BinOp("/", [node, self.parseExponent()])
+      elif self.tokenizer.next.type == "TT_REMAINDER":
+        self.tokenizer.selectNext()
+        node = BinOp("%", [node, self.parseExponent()])
       else:
         self.tokenizer.selectNext()
-        node = BinOp("AND", [node, self.parseFactor()])
+        node = BinOp("AND", [node, self.parseExponent()])
+
+    return node
+  
+  def parseExponent(self):
+    node = self.parseFactor()
+
+    while self.tokenizer.next.type == "TT_RAISE":
+      if self.tokenizer.next.type == "TT_RAISE":
+        self.tokenizer.selectNext()
+        node = BinOp("^", [node, self.parseFactor()])
 
     return node
 
@@ -361,6 +374,37 @@ class Parser():
             raise Exception(f"Unexpected token: {self.tokenizer.next.type}.")
       else:
         return Identifier(value, [])
+    elif self.tokenizer.next.type == "TT_ASK":
+      self.tokenizer.selectNext()
+      if self.tokenizer.next.type == "TT_LESS":
+        self.tokenizer.selectNext()
+        if self.tokenizer.next.type == "TT_TYPE" and self.tokenizer.next.value != "bool":
+          type = self.tokenizer.next.value
+          self.tokenizer.selectNext()
+          if self.tokenizer.next.type == "TT_GREATER":
+            self.tokenizer.selectNext()
+            if self.tokenizer.next.type == "TT_LPAR":
+              self.tokenizer.selectNext()
+              string = ""
+              if self.tokenizer.next.type == "TT_STRING":
+                string = self.tokenizer.next.value
+                self.tokenizer.selectNext()
+              
+              ask = Ask("ASK", [type, string])
+
+              if self.tokenizer.next.type == "TT_RPAR":
+                self.tokenizer.selectNext()
+                return ask
+              else:
+                raise Exception(f"Unexpected token: {self.tokenizer.next.type}.")
+            else:
+              raise Exception(f"Unexpected token: {self.tokenizer.next.type}.")
+          else:
+            raise Exception(f"Unexpected token: {self.tokenizer.next.type}.")
+        else:
+          raise Exception(f"Unexpected token: {self.tokenizer.next.type}.")
+      else:
+        raise Exception(f"Unexpected token: {self.tokenizer.next.type}.")
     else:
       raise Exception(f"Unexpected token: {self.tokenizer.next.type}.")
   

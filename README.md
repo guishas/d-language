@@ -1,4 +1,4 @@
-# Duda Language
+# D Language
 
 ## Descrição
 
@@ -18,7 +18,7 @@ Guilherme Lunetta
 
 `CHARACTER = ( LETTER | DIGIT | SYMBOL );`
 
-`BOOL = ( "true" | "false" );`
+`BOOL = ( "True" | "False" );`
 
 `INT = DIGIT, {DIGIT};`
 
@@ -32,29 +32,31 @@ Guilherme Lunetta
 
 `IDENTIFIER_DECLARATION = TYPE, IDENTIFIER;`
 
-`ASSIGNMENT = TYPE, IDENTIFIER, "=", EXPRESSION;`
+`ASSIGNMENT = TYPE, IDENTIFIER, "=", RELEXPRESSION | IDENTIFIER, "=", RELEXPRESSION;`
 
-`PRINT = "print", "(", EXPRESSION, ")";`
+`PRINT = "print", "(", RELEXPRESSION, ")";`
 
-`IF = "if", "(", CONDITIONAL, ")", BLOCK, [ "else", BLOCK ];`
+`IF = "if", "(", RELEXPRESSION, ")", BLOCK, [ "else", BLOCK ];`
 
-`WHILE = "while", "(", CONDITIONAL, ")", BLOCK;`
+`WHILE = "while", "(", RELEXPRESSION, ")", BLOCK;`
 
 `FUNCTION_DECLARATION = "func", IDENTIFIER, "(", [ TYPE, IDENTIFIER, {",", TYPE, IDENTIFIER} ], ")", "->", ( TYPE | "void" ), "{", FUNCTION_BODY, "}";`
 
-`FUNCTION_BODY = {STATEMENT}, [ FUNCTION_RETURN ];`
+`FUNCTION_BODY = {STATEMENT}, FUNCTION_RETURN;`
 
-`FUNCTION_RETURN = "return", EXPRESSION;`
+`FUNCTION_RETURN = "return", RELEXPRESSION | "return";`
 
 `FUNCTION_CALL = IDENTIFIER, "(", [ IDENTIFIER, {",", IDENTIFIER} ], ")";`
 
-`CONDITIONAL = EXPRESSION, { ( "<" | "<=" | "==" | "!=" | ">=" | ">" ), EXPRESSION };`
+`RELEXPRESSION = EXPRESSION, { ( "<" | "<=" | "==" | "!=" | ">=" | ">" ), EXPRESSION };`
 
-`EXPRESSION = TERM, { ( "*" | "/" | "^" ), TERM } | TERM, ( "and" | "or" ), TERM;`
+`EXPRESSION = TERM, { ( "+" | "-" | "or" ), TERM };`
 
-`TERM = FACTOR, { ( "+" | "-" ), FACTOR };`
+`TERM = FACTOR, { ( "*" | "/" | "%" | "and" ), FACTOR };`
 
-`FACTOR = ( INT | DOUBLE ) | BOOL | STRING | IDENTIFIER | ( ( "+" | "-" | "!" ), FACTOR ) | "(", EXPRESSION, ")";`
+`FACTOR = INT | DOUBLE | BOOL | STRING | IDENTIFIER | ( ( "+" | "-" | "!" ), FACTOR ) | "(", EXPRESSION, ")" | ASK | FUNCTION_CALL;`
+
+`ASK = "ask", "<", ( "int" | "double" | "string" ), ">", "(", {STRING}, ")"`;
 
 `STATEMENT = ( λ | IDENTIFIER_DECLARATION | ASSIGNMENT | FUNCTION_DEFINITION | FUNCTION_CALL | PRINT | WHILE | IF ), ";";`
 
@@ -67,8 +69,8 @@ Guilherme Lunetta
 ```java
 int a = 2;
 double b = 3.5;
-bool isDuda = true;
-string fileExtension = ".dd";
+bool isD = True;
+string fileExtension = ".d";
 
 print(b);
 print(fileExtension);
@@ -81,12 +83,12 @@ func showMessage(string message) -> void {
   print(message);
 }
 
-while (isDuda == true) {
+while (isD == True) {
   a = a * 2;
   print(a);
 
   if (a > 1000) {
-    isDuda = false;
+    isD = False;
   }
 }
 ```

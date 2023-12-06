@@ -7,15 +7,15 @@ void yyerror(const char *s) { printf("ERROR: %s\n", s); }
 %}
 
 %token STRING_LITERAL INT_LITERAL DOUBLE_LITERAL BOOL_LITERAL
-%token IDENTIFIER FUNCTION
+%token IDENTIFIER FUNCTION ASK 
 %token TYPE VOID
 %token AND OR
 %token NOT EQUAL NOT_EQUAL LESS_THAN LESS_EQUAL GREATER_THAN GREATER_EQUAL
 %token PRINT
 %token IF ELSE WHILE
 %token RETURN ARROW
-%token PLUS MINUS
-%token MULT DIV POW
+%token PLUS MINUS 
+%token MULT DIV POW REMAINDER
 %token LPAREN RPAREN
 %token LBRACE RBRACE
 %token COMMA SEMICOLON
@@ -35,7 +35,7 @@ statement_list:
     ;
 
 statement:
-    declaration_statement SEMICOLON
+    type_statement SEMICOLON
     | assignment_statement SEMICOLON 
     | function_definition_statement
     | function_call_statement SEMICOLON
@@ -49,7 +49,7 @@ block:
     LBRACE statement_list RBRACE
     ;
 
-declaration_statement:
+type_statement:
     TYPE IDENTIFIER
     | TYPE IDENTIFIER ASSIGN relexpression
     ;
@@ -95,7 +95,7 @@ function_arguments:
     ;
 
 function_argument_list:
-    expression
+    relexpression
     | function_argument_list COMMA relexpression
     ;
 
@@ -114,6 +114,7 @@ if_statement:
 
 return_statement:
     RETURN relexpression
+    | RETURN 
     ;
 
 relexpression: 
@@ -134,10 +135,15 @@ expression:
     ;
 
 term:
-    factor MULT factor
-    | factor POW factor
-    | factor DIV factor
-    | factor AND factor
+    exponent MULT exponent
+    | exponent DIV exponent
+    | exponent REMAINDER exponent
+    | exponent AND exponent
+    | exponent
+    ;
+
+exponent:
+    factor POW factor
     | factor
     ;
 
@@ -151,8 +157,13 @@ factor:
     | PLUS factor
     | MINUS factor
     | LPAREN relexpression RPAREN
+    | ask
+    | function_call_statement
     ;
 
+ask:
+    ASK LESS_THAN TYPE GREATER_THAN LPAREN RPAREN
+    | ASK LESS_THAN TYPE GREATER_THAN LPAREN STRING_LITERAL RPAREN
 %%
 
 int main() {

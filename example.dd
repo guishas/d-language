@@ -1,0 +1,65 @@
+int i = 1;
+double d = 2.0;
+string s = "string";
+bool b = True;
+
+print(i);
+print(d);
+print(s);
+print(b);
+
+int soma = 2 + 5;
+int sub = 6 - 3;
+double div = 5/2;
+int mult = 2 * 8;
+int exp = 2 ^ 7;
+int resto = 5 % 2;
+int negativo = -2;
+bool not = !False;
+print("concatenação de string: " + 2 + " funciona!");
+
+print(soma);
+print(sub);
+print(div);
+print(mult);
+print(exp);
+print(resto);
+print(negativo);
+print(not);
+
+bool equals = True == True;
+bool not_equal = True != False;
+bool greater = 2 > 1;
+bool greater_equal = 2 >= 2;
+bool less = 3 < 5;
+bool less_equal = 3 <= 4;
+
+print(equals);
+print(not_equal);
+print(greater);
+print(greater_equal);
+print(less);
+print(less_equal);
+
+int c = 1;
+while (c <= 10) {
+  print(c);
+  c = c + 1;
+}
+
+int input = ask<int>();
+double dinput = ask<double>();
+string sinput = ask<string>("Digite uma string: ");
+
+func printMessage(string message) -> void {
+  print(message);
+  return;
+}
+
+func soma(int a, int b) -> int {
+  return a + b;
+}
+
+int sum = soma(3, 5);
+print(sum);
+printMessage("olá, essa mensagem será printada dentro de uma função!");

@@ -47,7 +47,10 @@ class BinOp(Node):
         if x_type == "double" or y_type == "double":
           return ["double", float(x) / float(y)]
         else:
-          return ["int", x / y]
+          if (x/y)%2 != 0:
+            return ["double", x / y]
+          else:
+            return ["int", x / y]
     elif self.value == "^":
       if x_type not in ["int", "double"] or y_type not in ["int", "double"]:
         raise Exception(f"Expected \"int\" or \"double\" with \"^\" operator.")
@@ -56,6 +59,14 @@ class BinOp(Node):
           return ["double", float(x) ** float(y)]
         else:
           return ["int", x ** y]
+    elif self.value == "%":
+      if x_type not in ["int", "double"] or y_type not in ["int", "double"]:
+        raise Exception(f"Expected \"int\" or \"double\" with \"^\" operator.")
+      else:
+        if x_type == "double" or y_type == "double":
+          return ["double", float(x) % float(y)]
+        else:
+          return ["int", x % y]
     elif self.value == "AND":
       if (not x_type == "bool") or (not y_type == "bool"):
         raise Exception(f"Expected only \"bool\" type with \"and\" operator.")

@@ -6,7 +6,7 @@ class Tokenizer():
     self.source_code = source_code
     self.position = 0
     self.types = ["int", "double", "string", "bool", "void"]
-    self.reserved = ["print", "func", "return", "if", "else", "while", "True", "False"]
+    self.reserved = ["print", "func", "return", "if", "else", "while", "ask", "True", "False"]
     self.next = None
 
   def spyNext(self):
@@ -53,6 +53,9 @@ class Tokenizer():
     elif self.source_code[self.position] == '/':
       self.next = Token("TT_DIV", "/")
       self.position += 1
+    elif self.source_code[self.position] == '%':
+      self.next = Token("TT_REMAINDER", "%")
+      self.position += 1
     elif self.source_code[self.position] == ',':
       self.next = Token("TT_COMMA", ",")
       self.position += 1
@@ -79,7 +82,7 @@ class Tokenizer():
         self.next = Token("TT_ASSIGN", "=")
         self.position += 1
     elif self.source_code[self.position] == '!':
-      if self.source_code[self.position] == '=':
+      if self.source_code[self.position+1] == '=':
         self.next = Token("TT_DIFF", "!=")
         self.position += 2
       else:
