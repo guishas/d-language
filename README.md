@@ -1,4 +1,4 @@
-# Duda Language
+# D Language
 
 ## Descrição
 
@@ -69,8 +69,8 @@ Guilherme Lunetta
 ```java
 int a = 2;
 double b = 3.5;
-bool isDuda = True;
-string fileExtension = ".dd";
+bool isD = True;
+string fileExtension = ".d";
 
 print(b);
 print(fileExtension);
@@ -83,12 +83,12 @@ func showMessage(string message) -> void {
   print(message);
 }
 
-while (isDuda == True) {
+while (isD == True) {
   a = a * 2;
   print(a);
 
   if (a > 1000) {
-    isDuda = False;
+    isD = False;
   }
 }
 ```
