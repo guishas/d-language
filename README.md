@@ -1,10 +1,10 @@
 # D Language
 
-## Descrição
+## Description
 
-Linguagem de programação inspirada em Python e Java. 
+Programming language inspired in Java and Python.
 
-## Desenvolvedor
+## Developer
 
 Guilherme Lunetta
 
@@ -64,7 +64,7 @@ Guilherme Lunetta
 
 `PROGRAM = {STATEMENT};`
 
-## Exemplo de programa
+## Code example
 
 ```java
 int a = 2;
